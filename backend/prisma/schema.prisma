@@ -1,0 +1,40 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  // Relation: User → Sweet (1-to-many)
+  sweets Sweet[] @relation("UserSweets")
+}
+
+model Sweet {
+  id        Int    @id @default(autoincrement())
+  name      String
+  category  String
+  price     Float
+  quantity  Int
+  imageUrl  String?
+  createdBy Int
+
+  // MUST match the relation name on the other side
+  creator User @relation("UserSweets", fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
