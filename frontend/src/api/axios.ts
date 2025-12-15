@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:10000/api',
+  baseURL: 'https://sweetshop-ptz6.onrender.com/api',
   headers: {
     'Content-Type': 'application/json'
   }
