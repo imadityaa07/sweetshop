@@ -18,6 +18,23 @@ pipeline {
             }
         }
 
+        stage('ECR Test') {
+            agent any
+
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-sweetshop-ecr'
+                ]]) {
+                    sh '''
+                        aws ecr describe-repositories \
+                          --region eu-north-1 \
+                          --repository-names sweetshop-backend sweetshop-frontend
+                    '''
+                }
+            }
+        }
+
         stage('Backend Build') {
             agent {
                 docker {
