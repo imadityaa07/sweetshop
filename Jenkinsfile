@@ -1,14 +1,14 @@
 pipeline {
-    agent any
+    agent none
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Backend Build') {
+            agent {
+                docker {
+                    image 'node:24-bookworm-slim'
+                }
+            }
+
             steps {
                 dir('backend') {
                     sh 'npm ci'
@@ -18,6 +18,12 @@ pipeline {
         }
 
         stage('Frontend Build') {
+            agent {
+                docker {
+                    image 'node:24-bookworm-slim'
+                }
+            }
+
             steps {
                 dir('frontend') {
                     sh 'npm ci'
@@ -27,6 +33,8 @@ pipeline {
         }
 
         stage('Docker Build') {
+            agent any
+
             steps {
                 sh 'docker compose build'
             }
