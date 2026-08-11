@@ -1,14 +1,21 @@
 pipeline {
-    agent none
+    agent any
 
     stages {
-        stage('Backend Build') {
-            agent {
-                docker {
-                    image 'node:24-bookworm-slim'
+        stage('AWS Test') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-sweetshop-ecr'
+                ]]) {
+                    sh '''
+                        aws sts get-caller-identity
+                    '''
                 }
             }
+        }
 
+        stage('Backend Build') {
             steps {
                 dir('backend') {
                     sh 'npm ci'
@@ -18,12 +25,6 @@ pipeline {
         }
 
         stage('Frontend Build') {
-            agent {
-                docker {
-                    image 'node:24-bookworm-slim'
-                }
-            }
-
             steps {
                 dir('frontend') {
                     sh 'npm ci'
@@ -33,8 +34,6 @@ pipeline {
         }
 
         stage('Docker Build') {
-            agent any
-
             steps {
                 sh 'docker compose build'
             }
