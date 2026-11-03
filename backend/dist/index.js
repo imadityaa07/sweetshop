@@ -1,7 +1,7 @@
-import 'dotenv/config'; // 👈 MUST BE FIRST
+import 'dotenv/config'; // MUST be first
 import app from './app.js';
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 10000;
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
 //# sourceMappingURL=index.js.map
