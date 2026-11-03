@@ -1,18 +1,20 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://sweetshop-ptz6.onrender.com/api',
+  baseURL: '/api',
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 });
 
 // Attach token to every request automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 

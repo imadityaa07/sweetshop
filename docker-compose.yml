@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: sweetshop-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sweetshop
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: sweetshop
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sweetshop -d sweetshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sweetshop-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://sweetshop:devpassword@postgres:5432/sweetshop
+    ports:
+      - "10000:10000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sweetshop-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
